@@ -71,18 +71,19 @@ class ProductController extends Controller
     }
 
     public function edit(Product $product)
-    {
-        $categories = Category::all();
-        $clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
-        $shoeSizes = range(20, 47);
+{
+    $categories    = Category::all();
+    $clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+    $shoeSizes     = range(20, 47);
 
-        return view('admin.products.edit', compact(
-            'product',
-            'categories',
-            'clothingSizes',
-            'shoeSizes'
-        ));
-    }
+    return view('admin.products.edit', compact(
+        'product',
+        'categories',
+        'clothingSizes',
+        'shoeSizes'
+    ));
+}
+
 
     public function update(Request $request, Product $product)
     {

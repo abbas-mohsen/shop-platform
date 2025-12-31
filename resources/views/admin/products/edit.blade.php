@@ -67,25 +67,47 @@
 
                 {{-- AVAILABLE SIZES --}}
                 @php
-                    // Get currently selected sizes (from old() or from model)
+                    // 1) Get currently selected sizes (from old() or from DB)
                     $selectedSizes = old('sizes', $product->sizes ?? []);
 
+                    // If "sizes" is saved as a comma-separated string, convert to array
                     if (!is_array($selectedSizes)) {
-                        // If stored as comma-separated string in DB, convert to array
                         $selectedSizes = is_string($selectedSizes)
                             ? array_filter(array_map('trim', explode(',', $selectedSizes)))
                             : [];
                     }
 
-                    // Detect if this is a shoes category (name contains "shoe")
+                    // 2) Detect if this is a shoes product
                     $categoryName = strtolower(optional($product->category)->name ?? '');
-                    $isShoesCategory = (strpos($categoryName, 'shoe') !== false);
+                    $isShoesCategory = false;
+
+                    // Check by category name first
+                    if (
+                        strpos($categoryName, 'shoe') !== false ||     // "shoes", "shoe"
+                        strpos($categoryName, 'sneaker') !== false ||  // "sneakers"
+                        strpos($categoryName, 'boot') !== false        // "boots"
+                    ) {
+                        $isShoesCategory = true;
+                    }
+
+                    // Fallback: if any saved size is numeric between 20–47, treat as shoes
+                    if (!$isShoesCategory && !empty($selectedSizes)) {
+                        foreach ($selectedSizes as $sz) {
+                            if (is_numeric($sz)) {
+                                $num = (int)$sz;
+                                if ($num >= 20 && $num <= 47) {
+                                    $isShoesCategory = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 @endphp
 
                 <div class="mb-3">
                     <label class="form-label">Available Sizes</label>
 
-                    {{-- If shoes category → show shoe sizes; else → clothing sizes --}}
+                    {{-- If shoes → show shoe sizes; otherwise clothing sizes --}}
                     @if($isShoesCategory)
                         <div class="d-flex flex-wrap">
                             @foreach($shoeSizes as $size)

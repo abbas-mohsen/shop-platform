@@ -1,3 +1,4 @@
+{{-- resources/views/layouts/app.blade.php --}}
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -9,156 +10,221 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Bootstrap 5 CSS from CDN -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-        crossorigin="anonymous"
-    >
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Optional: your own CSS -->
+    <!-- Styles / Scripts (Laravel 8 default – keep as you already had it) -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/app.js') }}" defer></script>
+
     <style>
         body {
-            background-color: #f4f5f7;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top, #f5f7ff 0, #eef2f7 40%, #e3e7ee 100%);
+            min-height: 100vh;
         }
+
         .navbar-brand {
             font-weight: 700;
+            letter-spacing: 0.03em;
         }
+
+        .navbar {
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+        }
+
         .main-wrapper {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            padding-top: 1.5rem;
+            padding-bottom: 2rem;
         }
-        main {
-            flex: 1;
+
+        .card {
+            border-radius: 1rem;
+            border: none;
         }
-        footer {
-            font-size: 0.9rem;
+
+        .card.shadow-soft {
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        }
+
+        .btn-primary {
+            border-radius: 999px;
+            padding-inline: 1.5rem;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary {
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .badge-status {
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+
+        .badge-status.pending { background-color: #fff7e6; color: #b36b00; }
+        .badge-status.processing { background-color: #e6f4ff; color: #0050b3; }
+        .badge-status.completed { background-color: #e6fffb; color: #006d75; }
+        .badge-status.cancelled { background-color: #fff1f0; color: #a8071a; }
+
+        footer.site-footer {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .nav-link.active {
+            font-weight: 600;
+            position: relative;
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: -0.3rem;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
         }
     </style>
 </head>
 <body>
-<div class="main-wrapper">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">Shop Platform</a>
+    <div id="app">
+        {{-- Top Navbar --}}
+        <nav class="navbar navbar-expand-md navbar-light bg-white">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url('/') }}">
+                    Shop Platform
+                </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Left -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
-                           href="{{ route('home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}"
-                           href="{{ route('products.index') }}">Shop</a>
-                    </li>
-                    @auth
+                @php
+                    $cart = session('cart', []);
+                    $cartCount = collect($cart)->sum('quantity');
+                @endphp
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <!-- Left Side Of Navbar -->
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('cart.*') ? 'active' : '' }}"
-                               href="{{ route('cart.index') }}">Cart</a>
+                            <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
+                               href="{{ route('home') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}"
-                               href="{{ route('orders.index') }}">My Orders</a>
+                            <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}"
+                               href="{{ route('products.index') }}">Products</a>
                         </li>
-                    @endauth
 
-                    @auth
-                        @if (auth()->user()->is_admin)
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle {{ request()->is('admin*') ? 'active' : '' }}"
-                                   href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-                                    Admin
+                        @auth
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('cart.*') ? 'active' : '' }}"
+                                   href="{{ route('cart.index') }}">
+                                    Cart
+                                    @if($cartCount)
+                                        <span class="badge bg-primary ms-1">{{ $cartCount }}</span>
+                                    @endif
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('admin.products.index') }}">
-                                            Manage Products
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('admin.orders.index') }}">
-                                            Manage Orders
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
-                        @endif
-                    @endauth
-                </ul>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}"
+                                   href="{{ route('orders.index') }}">
+                                    My Orders
+                                </a>
+                            </li>
+                        @endauth
 
-                <!-- Right -->
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    @guest
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-sm btn-outline-light ms-2" href="{{ route('register') }}">Register</a>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <span class="navbar-text me-2">
-                                {{ Auth::user()->name }}
-                                @if(Auth::user()->is_admin)
-                                    <span class="badge bg-warning text-dark ms-1">Admin</span>
-                                @endif
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button class="btn btn-sm btn-outline-light" type="submit">Logout</button>
-                            </form>
-                        </li>
-                    @endguest
-                </ul>
+                        @auth
+                            @if(auth()->user()->is_admin ?? false)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle {{ request()->is('admin/*') ? 'active' : '' }}"
+                                       href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                        Admin
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('admin.products.index') }}">
+                                                Manage Products
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('admin.orders.index') }}">
+                                                Manage Orders
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endif
+                        @endauth
+                    </ul>
+
+                    <!-- Right Side Of Navbar -->
+                    <ul class="navbar-nav ms-auto">
+                        @guest
+                            @if (Route::has('login'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                </li>
+                            @endif
+
+                            @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a class="btn btn-primary btn-sm ms-2" href="{{ route('register') }}">
+                                        {{ __('Register') }}
+                                    </a>
+                                </li>
+                            @endif
+                        @else
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ Auth::user()->name }}
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <!-- <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                        My Orders
+                                    </a> -->
+
+                                    <!-- <div class="dropdown-divider"></div> -->
+
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </div>
+                            </li>
+                        @endguest
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <main class="py-4">
-        <div class="container">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
+        {{-- Main Content --}}
+        <main class="main-wrapper">
+            <div class="container">
+                @yield('content')
+            </div>
+        </main>
 
-            @if (session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            @yield('content')
-        </div>
-    </main>
-
-    <footer class="bg-dark text-light text-center py-3 mt-4">
-        <div class="container">
-            <small>&copy; {{ date('Y') }} Shop Platform – CSC 400 Web Programming Project</small>
-        </div>
-    </footer>
-</div>
-
-<!-- Bootstrap JS (Popper + JS bundle) -->
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-    crossorigin="anonymous"
-></script>
-
-@stack('scripts')
+        {{-- Footer --}}
+        <footer class="site-footer py-3 mt-4">
+            <div class="container d-flex justify-content-between flex-wrap">
+                <span>© {{ date('Y') }} Shop Platform</span>
+                <span class="text-muted">Made for CSC 400 – Web Programming</span>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>

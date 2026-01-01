@@ -133,16 +133,63 @@
             </tbody>
         </table>
 
-        <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex justify-content-between align-items-center mt-3">
             <h4>Total: ${{ number_format($total, 2) }}</h4>
+        </div>
 
-            <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-primary">
-                    Checkout
-                </button>
-            </form>
+        {{-- Checkout details (address + payment) --}}
+        <div class="row mt-3">
+            <div class="col-md-8">
+                <form id="checkout-form"
+                      action="{{ route('checkout.store') }}"
+                      method="POST"
+                      class="bg-white rounded-3 shadow-sm p-3">
+                    @csrf
+
+                    <h5 class="mb-3">Checkout details</h5>
+
+                    {{-- ADDRESS --}}
+                    <div class="mb-3">
+                        <label class="form-label">Shipping address</label>
+                        <textarea name="address" rows="2"
+                                  class="form-control @error('address') is-invalid @enderror"
+                                  placeholder="Street, building, city, phone...">{{ old('address') }}</textarea>
+                        @error('address')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- PAYMENT METHOD --}}
+                    <div class="mb-3" style="max-width: 260px;">
+                        <label class="form-label">Payment method</label>
+                        <select name="payment_method"
+                                class="form-select @error('payment_method') is-invalid @enderror">
+                            <option value="">Choose...</option>
+                            <option value="cash" {{ old('payment_method') === 'cash' ? 'selected' : '' }}>
+                                Cash
+                            </option>
+                            <option value="card" {{ old('payment_method') === 'card' ? 'selected' : '' }}>
+                                Card
+                            </option>
+                        </select>
+                        @error('payment_method')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold">
+                            Total: ${{ number_format($total, 2) }}
+                        </span>
+
+                        <button type="submit" class="btn btn-primary">
+                            Place order
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     @endif
 </div>
 @endsection
+

@@ -28,40 +28,51 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $cart = session('cart', []);
+{
+    // Get cart from session
+    $cart = session('cart', []);
 
-        if (empty($cart)) {
-            return redirect()->route('cart.index')
-                ->with('success', 'Your cart is empty.');
-        }
-
-        $total = collect($cart)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
-
-        // Simple: assume payment method "cash" for now
-        $order = Order::create([
-            'user_id'        => auth()->id(),
-            'total'   => $total,     // change to 'total' if that's your column
-            'status'         => 'pending',
-            'payment_method' => 'cash',
-        ]);
-
-        foreach ($cart as $item) {
-            OrderItem::create([
-                'order_id'   => $order->id,
-                'product_id' => $item['id'],
-                'quantity'   => $item['quantity'],
-                'unit_price' => $item['price'],
-                'line_total' => $item['price'] * $item['quantity'],
-            ]);
-        }
-
-        // Clear cart
-        session()->forget('cart');
-
-        return redirect()->route('orders.show', $order)
-            ->with('success', 'Order placed successfully.');
+    if (empty($cart)) {
+        return redirect()->route('cart.index')
+            ->with('success', 'Your cart is empty.');
     }
+
+    // Validate address + payment
+    $data = $request->validate([
+        'address'         => ['required', 'string', 'max:500'],
+        'payment_method'  => ['required', 'in:cash,card'],
+    ]);
+
+    // Compute total from cart
+    $total = collect($cart)->sum(function ($item) {
+        return $item['price'] * $item['quantity'];
+    });
+
+    // Create order
+    $order = \App\Models\Order::create([
+        'user_id'        => auth()->id(),
+        'total'          => $total,
+        'status'         => 'pending',          // or whatever default you use
+        'payment_method' => $data['payment_method'],
+        'address'        => $data['address'],
+    ]);
+
+    // Create order items
+    foreach ($cart as $item) {
+        \App\Models\OrderItem::create([
+            'order_id'   => $order->id,
+            'product_id' => $item['id'],
+            'quantity'   => $item['quantity'],
+            'unit_price' => $item['price'],
+            'line_total' => $item['price'] * $item['quantity'],
+        ]);
+    }
+
+    // Clear cart
+    session()->forget('cart');
+
+    return redirect()->route('orders.show', $order)
+        ->with('success', 'Order placed successfully!');
+}
+
 }

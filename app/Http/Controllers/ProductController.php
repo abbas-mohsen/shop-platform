@@ -12,18 +12,24 @@ class ProductController extends Controller
     {
         $query = Product::with('category');
 
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+        // Read the search term from ?q=...
+        $search = trim($request->get('q', ''));
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
         }
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
+        // You can add more filters here later (by category, etc.)
 
-        $products   = $query->paginate(12);
-        $categories = Category::all();
+        $products = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString(); // keep ?q= in pagination links
 
-        return view('products.index', compact('products', 'categories'));
+        return view('products.index', compact('products'));
     }
 
     public function show(Product $product)

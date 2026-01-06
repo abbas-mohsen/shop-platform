@@ -21,10 +21,9 @@ class ProductController extends Controller
     {
         $categories = Category::all();
 
-        // Clothing sizes (tops / pants)
+        
         $clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
-        // Shoes sizes 20–47
         $shoeSizes = range(20, 47);
 
         return view('admin.products.create', compact(
@@ -43,7 +42,7 @@ class ProductController extends Controller
             'price'       => ['required', 'numeric', 'min:0'],
             'stock'       => ['required', 'integer', 'min:0'],
             'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'sizes'       => ['nullable', 'array'],    // multiple sizes
+            'sizes'       => ['nullable', 'array'],  
             'sizes.*'     => ['string', 'max:10'],
         ]);
 
@@ -53,14 +52,11 @@ class ProductController extends Controller
         $product->description = $data['description'] ?? null;
         $product->price       = $data['price'];
         $product->stock       = $data['stock'];
-
-        // thanks to casts, this array becomes JSON in DB
         $product->sizes = $data['sizes'] ?? null;
 
-        // handle image upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
-            $product->image = $path; // DB column is "image"
+            $product->image = $path;
         }
 
         $product->save();
@@ -106,7 +102,6 @@ class ProductController extends Controller
 
         $product->sizes = $data['sizes'] ?? null;
 
-        // new image (delete old one if exists)
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);

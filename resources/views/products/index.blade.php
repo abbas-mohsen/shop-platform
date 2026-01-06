@@ -16,16 +16,13 @@
 <div class="row g-3">
     @forelse($products as $product)
         @php
-            // Normalize sizes to a clean array
             $sizes = [];
 
             if (is_array($product->sizes)) {
                 $sizes = $product->sizes;
             } elseif (!empty($product->sizes)) {
-                // if stored as comma-separated string
                 $sizes = explode(',', $product->sizes);
             } elseif (!empty($product->size)) {
-                // fallback to single size column if you still use it
                 $sizes = [$product->size];
             }
 

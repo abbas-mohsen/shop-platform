@@ -12,7 +12,7 @@ class ProductController extends Controller
     {
         $query = Product::with('category');
 
-        // Read the search term from ?q=...
+        
         $search = trim($request->get('q', ''));
 
         if ($search !== '') {
@@ -22,12 +22,11 @@ class ProductController extends Controller
             });
         }
 
-        // You can add more filters here later (by category, etc.)
 
         $products = $query
             ->orderBy('created_at', 'desc')
             ->paginate(12)
-            ->withQueryString(); // keep ?q= in pagination links
+            ->withQueryString();
 
         return view('products.index', compact('products'));
     }

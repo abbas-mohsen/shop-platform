@@ -23,15 +23,13 @@ class CartController extends Controller
 
     public function add(Request $request, Product $product)
     {
-        // Allowed sizes for THIS product
-        $availableSizes = $product->sizes_list;   // <- accessor from Product model
+        $availableSizes = $product->sizes_list;
 
         $request->validate([
             'quantity' => ['required', 'integer', 'min:1'],
             'size'     => [
                 'nullable',
                 function ($attribute, $value, $fail) use ($availableSizes) {
-                    // If the product has sizes configured, user must pick one of them
                     if (!empty($availableSizes)) {
                         if (!$value) {
                             return $fail('Please choose a size.');
@@ -57,7 +55,7 @@ class CartController extends Controller
             'price'    => $product->price,
             'image'    => $product->image,
             'size'     => $size,
-            'sizes'    => $availableSizes,  // store allowed sizes in cart item
+            'sizes'    => $availableSizes,
             'quantity' => $currentQty + $quantityToAdd,
         ];
 

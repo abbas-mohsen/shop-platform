@@ -126,8 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateSizeUI() {
         const option = categorySelect.options[categorySelect.selectedIndex];
         const name = option ? (option.getAttribute('data-name') || '') : '';
-
-        // If category name contains 'shoe', treat as shoes, else clothing
         if (name.includes('shoe')) {
             clothingDiv.style.display = 'none';
             shoeDiv.style.display = '';

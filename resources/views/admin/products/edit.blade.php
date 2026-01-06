@@ -67,30 +67,21 @@
 
                 {{-- AVAILABLE SIZES --}}
                 @php
-                    // 1) Get currently selected sizes (from old() or from DB)
                     $selectedSizes = old('sizes', $product->sizes ?? []);
-
-                    // If "sizes" is saved as a comma-separated string, convert to array
                     if (!is_array($selectedSizes)) {
                         $selectedSizes = is_string($selectedSizes)
                             ? array_filter(array_map('trim', explode(',', $selectedSizes)))
                             : [];
                     }
-
-                    // 2) Detect if this is a shoes product
                     $categoryName = strtolower(optional($product->category)->name ?? '');
                     $isShoesCategory = false;
-
-                    // Check by category name first
                     if (
-                        strpos($categoryName, 'shoe') !== false ||     // "shoes", "shoe"
-                        strpos($categoryName, 'sneaker') !== false ||  // "sneakers"
-                        strpos($categoryName, 'boot') !== false        // "boots"
+                        strpos($categoryName, 'shoe') !== false ||     
+                        strpos($categoryName, 'sneaker') !== false ||  
+                        strpos($categoryName, 'boot') !== false        
                     ) {
                         $isShoesCategory = true;
                     }
-
-                    // Fallback: if any saved size is numeric between 20–47, treat as shoes
                     if (!$isShoesCategory && !empty($selectedSizes)) {
                         foreach ($selectedSizes as $sz) {
                             if (is_numeric($sz)) {

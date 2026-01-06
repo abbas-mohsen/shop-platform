@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,7 +15,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_admin', // <--- important
+        'role',
     ];
 
     protected $hidden = [
@@ -26,16 +25,18 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_admin'          => 'boolean', // <--- so you get true/false
     ];
 
-    // Helper to use in Blade or controllers
     public function isAdmin()
     {
-        return $this->is_admin === true;
+        return $this->role === 'admin';
     }
 
-    // Fixes the BadMethodCallException for orders()
+    public function isCustomer()
+    {
+        return $this->role === 'customer';
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);

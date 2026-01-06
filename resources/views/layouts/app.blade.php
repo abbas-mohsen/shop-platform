@@ -142,7 +142,7 @@
                         @endauth
 
                         @auth
-                            @if(auth()->user()->is_admin ?? false)
+                            @if(auth()->user()->isAdmin())
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle {{ request()->is('admin/*') ? 'active' : '' }}"
                                        href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">

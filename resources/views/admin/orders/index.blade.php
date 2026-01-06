@@ -36,7 +36,6 @@
                     <tbody>
                     @foreach($orders as $order)
                         @php
-                            // simple mapping of status -> bootstrap color
                             $statusClass = 'secondary';
                             switch ($order->status) {
                                 case 'pending':  $statusClass = 'warning'; break;

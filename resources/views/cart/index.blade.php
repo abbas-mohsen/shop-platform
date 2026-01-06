@@ -34,7 +34,6 @@
             <tbody>
             @foreach($cart as $productId => $item)
                 @php
-                    // Sizes always as array
                     $availableSizes = $item['sizes'] ?? [];
                     if (!is_array($availableSizes)) {
                         $availableSizes = array_filter(array_map('trim', explode(',', $availableSizes)));
